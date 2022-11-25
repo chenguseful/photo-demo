@@ -87,11 +87,12 @@
      */
     function openCamera() {
         navigator.mediaDevices.getUserMedia(config).then(mediaStream => {
+            console.log(mediaStream)
             //接收一个mediaStream参数与video标签进行对接
             if ("srcObject" in video) {
-                video.srcObject = stream;
+                video.srcObject = mediaStream;
             } else {
-                video.src = window.URL.createObjectURL(stream);
+                video.src = window.URL.createObjectURL(mediaStream);
             }
             video.play();
         }).catch((err) => {
