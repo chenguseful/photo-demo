@@ -1,119 +1,122 @@
 <!DOCTYPE html>
 <html lang="en">
-	<head>
-		<title>相机测试</title>
-		<style>
-			* {
-				padding: 0;
-				margin: 0;
-			}
 
-			.btn {
-				width: 100px;
-				padding: 10px 0;
-				border-radius: 4px;
-				background: #ff5415;
-				text-align: center;
-				color: #fff;
-				cursor: pointer;
-				border: none;
-				font-size: 16px;
-			}
+<head>
+    <title>相机测试</title>
+    <style>
+        * {
+            padding: 0;
+            margin: 0;
+        }
 
-			video,
-			canvas {
-				width: 500px;
-				height: 500px;
-				border: 1px solid #ff5415;
-				border-radius: 4px;
-				margin-left: 5px;
-			}
+        .btn {
+            width: 100px;
+            padding: 10px 0;
+            border-radius: 4px;
+            background: #ff5415;
+            text-align: center;
+            color: #fff;
+            cursor: pointer;
+            border: none;
+            font-size: 16px;
+        }
 
-			.camera-warpper {
-				padding: 20px 0;
-				width: 100%;
-			}
+        video,
+        canvas {
+            width: 500px;
+            height: 500px;
+            border: 1px solid #ff5415;
+            border-radius: 4px;
+            margin-left: 5px;
+        }
 
-			.video-container {
-				display: flex;
-				align-items: center;
-				justify-content: center;
-			}
+        .camera-warpper {
+            padding: 20px 0;
+            width: 100%;
+        }
 
-			.btns {
-				padding: 20px 0;
-				display: flex;
-				align-items: center;
-				justify-content: center;
-			}
+        .video-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
 
-			button+button {
-				margin-left: 10px;
-			}
-		</style>
-	</head>
-	<body>
-		<div class="camera-warpper">
-			<div class="video-container">
-				<video id="camera-video"></video>
-				<canvas id="camera-canvas" width="500" height="500"></canvas>
-			</div>
-			<div class="btns">
-				<button class="btn" onclick="openCamera()">开启摄像<button>
-				<button class="btn" onclick="takePicture()">拍照<button>
-				<button class="btn" onclick="downPhoto()">下载</button>
-			</div>
-		</div>
-	</body>
-	<script>
-		const config = {
-			// video属性设置
-			video: {
-				width: 500,
-				height: 500
-			},
-			// audio属性设置
-			audio: false
-		}
+        .btns {
+            padding: 20px 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
 
-		const video = document.getElementById('camera-video');
-		const canvas = document.getElementById("camera-canvas");
+        button+button {
+            margin-left: 10px;
+        }
+    </style>
+</head>
 
-		/**
-		 * 开启摄像
-		 */
-		function openCamera() {
-			navigator.mediaDevices.getUserMedia(config).then(mediaStream => {
-				//接收一个mediaStream参数与video标签进行对接
-				console.log(mediaStream);
-				video.srcObject = mediaStream;
-				video.play();
-			}).catch((err) => {
-				console.error(err);
-			});
-		}
+<body>
+    <div class="camera-warpper">
+        <div class="video-container">
+            <video id="camera-video"></video>
+            <canvas id="camera-canvas" width="500" height="500"></canvas>
+        </div>
+        <div class="btns">
+            <button class="btn" onclick="openCamera()">开启摄像<button>
+                    <button class="btn" onclick="takePicture()">拍照<button>
+                            <button class="btn" onclick="downPhoto()">下载</button>
+        </div>
+    </div>
+</body>
+<script>
+    const config = {
+        // video属性设置
+        video: {
+            width: 500,
+            height: 500,
+            facingMode: 'environment'
+        },
+        // audio属性设置
+        audio: false
+    }
 
-		/**
-		 * 拍照、canvas绘制
-		 */
-		function takePicture() {
-			let ctx = canvas.getContext('2d');
-			ctx.drawImage(video, 0, 0, config.video.width, config.video.height);
-		}
+    const video = document.getElementById('camera-video');
+    const canvas = document.getElementById("camera-canvas");
 
-		/**
-		 * canvas下载图片
-		 */
-		function downPhoto() {
-			const MIME_TYPE = "image/png";
-			const dlLink = document.createElement('a');
-			dlLink.download = '测试照片';
-			dlLink.href = canvas.toDataURL(MIME_TYPE);
-			dlLink.dataset.downloadurl = [MIME_TYPE, dlLink.download, dlLink.href].join(':');
-			document.body.appendChild(dlLink);
-			dlLink.click();
-			document.body.removeChild(dlLink);
-		}
-	</script>
+    /**
+     * 开启摄像
+     */
+    function openCamera() {
+        navigator.mediaDevices.getUserMedia(config).then(mediaStream => {
+            //接收一个mediaStream参数与video标签进行对接
+            console.log(mediaStream);
+            video.srcObject = mediaStream;
+            video.play();
+        }).catch((err) => {
+            console.error(err);
+        });
+    }
+
+    /**
+     * 拍照、canvas绘制
+     */
+    function takePicture() {
+        let ctx = canvas.getContext('2d');
+        ctx.drawImage(video, 0, 0, config.video.width, config.video.height);
+    }
+
+    /**
+     * canvas下载图片
+     */
+    function downPhoto() {
+        const MIME_TYPE = "image/png";
+        const dlLink = document.createElement('a');
+        dlLink.download = '测试照片';
+        dlLink.href = canvas.toDataURL(MIME_TYPE);
+        dlLink.dataset.downloadurl = [MIME_TYPE, dlLink.download, dlLink.href].join(':');
+        document.body.appendChild(dlLink);
+        dlLink.click();
+        document.body.removeChild(dlLink);
+    }
+</script>
+
 </html>
-
