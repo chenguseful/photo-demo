@@ -1,66 +1,119 @@
 <!DOCTYPE html>
 <html lang="en">
+	<head>
+		<title>相机测试</title>
+		<style>
+			* {
+				padding: 0;
+				margin: 0;
+			}
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <style>
-        video {
-            width: 300px;
-            height: 300px;
-            border: 1px solid #ccc;
-        }
+			.btn {
+				width: 100px;
+				padding: 10px 0;
+				border-radius: 4px;
+				background: #ff5415;
+				text-align: center;
+				color: #fff;
+				cursor: pointer;
+				border: none;
+				font-size: 16px;
+			}
 
-        canvas {
-            width: 300px;
-            height: 300px;
-            border: 1px solid red;
-        }
-    </style>
-    <title>Document</title>
-</head>
+			video,
+			canvas {
+				width: 500px;
+				height: 500px;
+				border: 1px solid #ff5415;
+				border-radius: 4px;
+				margin-left: 5px;
+			}
 
-<body>
-    <video autoplay id='video'></video>
-    <canvas id="output"></canvas>
-</body>
+			.camera-warpper {
+				padding: 20px 0;
+				width: 100%;
+			}
 
+			.video-container {
+				display: flex;
+				align-items: center;
+				justify-content: center;
+			}
+
+			.btns {
+				padding: 20px 0;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+			}
+
+			button+button {
+				margin-left: 10px;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="camera-warpper">
+			<div class="video-container">
+				<video id="camera-video"></video>
+				<canvas id="camera-canvas" width="500" height="500"></canvas>
+			</div>
+			<div class="btns">
+				<button class="btn" onclick="openCamera()">开启摄像<button>
+				<button class="btn" onclick="takePicture()">拍照<button>
+				<button class="btn" onclick="downPhoto()">下载</button>
+			</div>
+		</div>
+	</body>
+	<script>
+		const config = {
+			// video属性设置
+			video: {
+				width: 500,
+				height: 500
+			},
+			// audio属性设置
+			audio: true
+		}
+
+		const video = document.getElementById('camera-video');
+		const canvas = document.getElementById("camera-canvas");
+
+		/**
+		 * 开启摄像
+		 */
+		function openCamera() {
+			navigator.mediaDevices.getUserMedia(config).then(mediaStream => {
+				//接收一个mediaStream参数与video标签进行对接
+				console.log(mediaStream);
+				video.srcObject = mediaStream;
+				video.play();
+			}).catch((err) => {
+				console.error(err);
+			});
+		}
+
+		/**
+		 * 拍照、canvas绘制
+		 */
+		function takePicture() {
+			let ctx = canvas.getContext('2d');
+			ctx.drawImage(video, 0, 0, config.video.width, config.video.height);
+		}
+
+		/**
+		 * canvas下载图片
+		 */
+		function downPhoto() {
+			const MIME_TYPE = "image/png";
+			const dlLink = document.createElement('a');
+			dlLink.download = '测试照片';
+			dlLink.href = canvas.toDataURL(MIME_TYPE);
+			dlLink.dataset.downloadurl = [MIME_TYPE, dlLink.download, dlLink.href].join(':');
+			document.body.appendChild(dlLink);
+			dlLink.click();
+			document.body.removeChild(dlLink);
+		}
+	</script>
 </html>
-<script>
-    //var video = document.getElementById('video')
-    //var back = document.getElementById('output')
-    var video = $("#video").get(0)
-    var back = $("#output").get(0)
-    //console.log(back,video)
-    var backcontext = back.getContext('2d')
-    function draw() {
-        backcontext.drawImage(video, 0, 0, back.width, back.height)
-        try {
-            backcontext.drawImage(video, 0, 0, back.width, back.height)
-        } catch (e) {
-            if (e.name == "NS_ERROR_NOT_AVAILABLE") {
-                return setInterval(draw, 200)
-            } else {
-                throw e
-            }
-        }
-        setTimeout(draw, 200)
-    }
-    var success = function (stream) {
-        console.log('摄像头开启成功')
-        //videoUrl = window.URL.createObjectURL(stream)
-        //video.src = videoUrl
-        video.srcObject = stream
-        draw()
-    }
-    var error = (error) => {
-        alert('调用失败')
-    }
-    navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia
-    navigator.getUserMedia({
-        video: {
-            facingMode: 'environment'
-        }, audio: false
-    }, success, error)
-</script>
+
