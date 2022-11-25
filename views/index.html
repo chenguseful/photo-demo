@@ -93,6 +93,7 @@
                 video.srcObject = mediaStream;
             } else {
                 video.src = window.URL.createObjectURL(mediaStream);
+                alert(video.src)
             }
             video.play();
         }).catch((err) => {
